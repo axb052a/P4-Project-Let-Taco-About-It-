@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
 
-# Standard library imports
-
 # Remote library imports
-from flask import request
-from flask_restful import Resource
+from flask import Flask, request, make_response
+from flask_restful import Resource, Api
+from flask_sqlalchemy import SQLAlchemy
 
 # Local imports
 from config import app, db, api
+
 # Add your model imports
 
+class User(Resource):
+    pass
+
+class Taco(Resource):
+    pass
+
+class Review(Resource):
+    pass
+
+class UserTacoAssociation(Resource):
+    pass
 
 # Views go here!
 
