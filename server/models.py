@@ -57,6 +57,7 @@ class Taco(db.Model, SerializerMixin): # Attributes will be taco_id, name, recip
     
 id = db.Column(db.Integer, primary_key=True)
 taco_name = db.Column(db.String)
+taco_type = db.Column(db.String)
 image = db.Column(db.String)
 instuctions = db.Column(db.Text)
 time_to_cook = db.Column(db.Integer)
