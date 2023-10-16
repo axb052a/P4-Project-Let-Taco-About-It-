@@ -19,8 +19,6 @@ class Taco(Resource):
 class Review(Resource):
     pass
 
-class UserTacoAssociation(Resource):
-    pass
 
 # Views go here!
 
