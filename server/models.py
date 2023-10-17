@@ -4,14 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
+
 from config import db, bcrypt
 
 # Models go here!
 
-class User(db.Model, SerializerMixin): # Attributes will be user_id, username, id
+class User(db.Model, SerializerMixin):
     __tablename__ = "users"
     serialize_rules = (
-        '-reviews.user',
         '-tacos.user', 
         '-favortites.user'
     )
@@ -42,57 +42,38 @@ class User(db.Model, SerializerMixin): # Attributes will be user_id, username, i
             raise ValueError("Must provide at least one character to sign up")
         return value
 
-# table relationships 
-    reviews = db.relationship("Review", back_populates="user", cascade="all ,delete-orphan")
+# table relationships
     tacos = db.relationship("Taco", back_populates="user", cascade="all, delete-orphan")
     favorites = association_proxy("tacos", "favorites")
      
-class Taco(db.Model, SerializerMixin): # Attributes will be taco_id, name, recipe
-    __tablename__ = 'taco'
+class Taco(db.Model, SerializerMixin): 
+    __tablename__ = 'tacos'
     serialize_rules = (
-        "-favorites.taco",
-        '-user.taco',
+        '-user.tacos',
         '-quantities.taco', 
-        '-reviews.taco')
+        )
     
-id = db.Column(db.Integer, primary_key=True)
-taco_name = db.Column(db.String)
-taco_type = db.Column(db.String)
-image = db.Column(db.String)
-instuctions = db.Column(db.Text)
-time_to_cook = db.Column(db.Integer)
-time_to_prepare = db.Column(db.Integer)
-user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    taco_name = db.Column(db.String)
+    taco_type = db.Column(db.String)
+    image = db.Column(db.String)
+    instructions = db.Column(db.Text) 
+    time_to_cook = db.Column(db.Integer)
+    time_to_prepare = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-# table relationships 
-reviews = db.relationship('Review', back_populates="taco", cascade='all, delete-orphan')
-quantities = db.relationship("Quantity", back_populates='taco', cascade="all, delete-orphan")
+    # table relationships 
+    quantities = db.relationship("Quantity", back_populates='taco', cascade="all, delete-orphan")
 
-# association proxy 
+    # association proxy 
 
-ingredients = association_proxy("quantities", "ingredient")
+    ingredients = association_proxy("quantities", "ingredient")
 
-def __repr__(self):
-    return f'Taco {self.taco_name} ID {self.id}'
+    def __repr__(self):
+        return f'Taco {self.taco_name} ID {self.id}'
 
 # add validation rules here once seeded 
 
-# class Review(db.Model, SerializerMixin): # Attributes will be review_id, rating, comment
-#     __tablename__ = "reviews"
-#     # serialize_rules = (
-#     #     "-users.review",
-#     #     "-tacos.review",
-#     # )
-    
-#     id = db.Column(db.Integer, primary_key=True)
-#     body = db.Column(db.Text)
-#     title = db.Column(db.String)
-#     taco_id = db.Column(db.Integer)
-    
-#     reviews = db.relationship('Review', back_populates="user", cascade="all, delete-orphan")
-    
-    
- 
 class Quantity(db.Model, SerializerMixin):
     __tablename__ = "quantities"
     id = db.Column(db.Integer, primary_key = True)
@@ -147,7 +128,7 @@ class Favorite(db.Model, SerializerMixin):
     
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     image = db.Column(db.String)
 
     def __repr__(self):
