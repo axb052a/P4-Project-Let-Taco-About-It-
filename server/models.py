@@ -9,13 +9,23 @@ from config import db
 
 # Models go here!
 
+user_taco_favorites = db.Table(
+    "user_taco_favorites",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("taco_id", db.Integer, db.ForeignKey("tacos.id")),
+
+)
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
     serialize_rules = (
         '-tacos.user', 
         '-favorites.user'
     )
-    
+    favorite_tacos = db.relationship(
+        "Taco",
+        secondary=user_taco_favorites,
+        back_populates="favorited_by",
+    )
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
@@ -52,7 +62,11 @@ class Taco(db.Model, SerializerMixin):
         '-user.tacos',
         '-quantities.taco', 
         )
-    
+    favorited_by = db.relationship(
+        "User",
+        secondary=user_taco_favorites,
+        back_populates="favorite_tacos",
+    )
     id = db.Column(db.Integer, primary_key=True)
     taco_name = db.Column(db.String)
     taco_type = db.Column(db.String)
