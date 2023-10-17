@@ -8,6 +8,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 
+
 # Local imports
 
 # Instantiate app, set attributes
@@ -29,3 +30,4 @@ api = Api(app)
 
 # Instantiate CORS
 CORS(app)
+
