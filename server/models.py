@@ -3,9 +3,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
+import bcrypt
 
-
-from config import db, bcrypt
+from config import db
 
 # Models go here!
 
@@ -13,7 +13,7 @@ class User(db.Model, SerializerMixin):
     __tablename__ = "users"
     serialize_rules = (
         '-tacos.user', 
-        '-favortites.user'
+        '-favorites.user'
     )
     
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +61,7 @@ class Taco(db.Model, SerializerMixin):
     time_to_cook = db.Column(db.Integer)
     time_to_prepare = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates="tacos", cascade="all, delete-orphan", single_parent=True)
 
     # table relationships 
     quantities = db.relationship("Quantity", back_populates='taco', cascade="all, delete-orphan")
@@ -73,6 +74,21 @@ class Taco(db.Model, SerializerMixin):
         return f'Taco {self.taco_name} ID {self.id}'
 
 # add validation rules here once seeded 
+class Ingredients(db.Model, SerializerMixin):
+    __tablename__ = "ingredients"
+    # serialize_rules = (
+    #     "-quantities.ingredient",
+    #     "-quantities.taco",
+    # )
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+
+    def __repr__(self):
+        return f"Ingredient {self.name}"
+
+    quantities = db.relationship("Quantity", back_populates="ingredients", cascade="all, delete-orphan")
+    tacos = association_proxy("quantities", "taco")
 
 class Quantity(db.Model, SerializerMixin):
     __tablename__ = "quantities"
@@ -80,7 +96,11 @@ class Quantity(db.Model, SerializerMixin):
     quantity = db.Column(db.Float)
     measurement = db.Column(db.String)
     taco_id = db.Column(db.Integer, db.ForeignKey("tacos.id"))
-    ingredients_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
+    ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
+    taco = db.relationship("Taco", back_populates="quantities")
+
+    ingredients = db.relationship("Ingredients", back_populates="quantities")
+   
     
     def __repr__(self):
         return f"Quantity {self.quantity}"
@@ -107,21 +127,7 @@ class Quantity(db.Model, SerializerMixin):
             return ValueError("Invalid measurement")
         return measurement
 
-class Ingredients(db.Model, SerializerMixin):
-    __tablename__ = "ingredients"
-    # serialize_rules = (
-    #     "-quantities.ingredient",
-    #     "-quantities.taco",
-    # )
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-
-    def __repr__(self):
-        return f"Ingredient {self.name}"
-
-    quantities = db.relationship("Quantity", back_populates="ingredient", cascade="all, delete-orphan")
-    tacos = association_proxy("quantities", "taco")
 
 class Favorite(db.Model, SerializerMixin):
     __tablename__ = "favorites"

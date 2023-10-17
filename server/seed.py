@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+import bcrypt
+from models import User
 # Standard library imports
 from random import randint, choice as rc
 
@@ -23,12 +24,15 @@ if __name__ == '__main__':
             {"username": "user2", "email": "user2@example.com", "password": "password2"},
         ]
 
-        for user in user_list:
-            user = User(username=user["username"], email=user["email"])
-            user.password_hash = user["password"]
+        for user_data in user_list:
+            user = User(username=user_data["username"], email=user_data["email"])
+            # Hash the password using bcrypt
+            password_hash = bcrypt.hashpw(user_data["password"].encode("utf-8"), bcrypt.gensalt())
+            user._password_hash = password_hash.decode("utf-8")
             db.session.add(user)
 
         db.session.commit()
+        
 
         taco_list = [
             {
@@ -68,9 +72,18 @@ if __name__ == '__main__':
             },
         ]
 
-        for taco in taco_list:
-            taco = Taco("")
+        for taco_data in taco_list:
+            taco = Taco(
+                taco_name=taco_data["taco_name"],
+                taco_type=taco_data["taco_type"],
+                user_id=taco_data["user_id"],
+                instructions=taco_data["instructions"],
+                image=taco_data["image"],
+                time_to_cook=taco_data["time_to_cook"],
+                time_to_prepare=taco_data["time_to_prepare"]
+            )
             db.session.add(taco)
+
 
         db.session.commit()
 
@@ -83,8 +96,8 @@ if __name__ == '__main__':
              "Lettuce",
         ]
 
-        for ingredient in ingredient_list:
-            ingredient = Ingredients("")
+        for ingredient_name in ingredient_list:
+            ingredient = Ingredients(name=ingredient_name)
             db.session.add(ingredient)
 
         db.session.commit()
@@ -97,10 +110,13 @@ if __name__ == '__main__':
             {"quantity": 1, "measurement": "C", "taco_id": 2, "ingredient_id": 4},
         ]
 
-        for quantity in quantity_list:
-            quantity = Quantity("")
+        for quantity_data in quantity_list:
+            quantity = Quantity(
+                quantity=quantity_data["quantity"],
+                measurement=quantity_data["measurement"],
+                taco_id=quantity_data["taco_id"],
+                ingredient_id=quantity_data["ingredient_id"]
+            )
             db.session.add(quantity)
-
+    
         db.session.commit()
-
-        print("Seeding complete.")
