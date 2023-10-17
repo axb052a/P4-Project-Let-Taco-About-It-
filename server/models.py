@@ -13,6 +13,7 @@ user_taco_favorites = db.Table(
     "user_taco_favorites",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("taco_id", db.Integer, db.ForeignKey("tacos.id")),
+    
 
 )
 class User(db.Model, SerializerMixin):
