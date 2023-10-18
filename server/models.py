@@ -3,9 +3,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
-import bcrypt
 
-from config import db
+from config import db, bcrypt
 
 # Models go here!
 
@@ -20,7 +19,7 @@ class User(db.Model, SerializerMixin):
     __tablename__ = "users"
     serialize_rules = (
         '-tacos.user', 
-        '-favorites.user'
+        '-favorites.user',
     )
     favorite_tacos = db.relationship(
         "Taco",
@@ -59,15 +58,8 @@ class User(db.Model, SerializerMixin):
      
 class Taco(db.Model, SerializerMixin): 
     __tablename__ = 'tacos'
-    serialize_rules = (
-        '-user.tacos',
-        '-quantities.taco', 
-        )
-    favorited_by = db.relationship(
-        "User",
-        secondary=user_taco_favorites,
-        back_populates="favorite_tacos",
-    )
+    
+   
     id = db.Column(db.Integer, primary_key=True)
     taco_name = db.Column(db.String)
     taco_type = db.Column(db.String)
@@ -78,12 +70,26 @@ class Taco(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates="tacos", cascade="all, delete-orphan", single_parent=True)
 
+    favorited_by = db.relationship(
+        "User",
+        secondary=user_taco_favorites,
+        back_populates="favorite_tacos",
+    )
+
     # table relationships 
     quantities = db.relationship("Quantity", back_populates='taco', cascade="all, delete-orphan")
 
-    # association proxy 
+    # association proxy
+
 
     ingredients = association_proxy("quantities", "ingredient")
+
+    serialize_rules = (
+        '-user',
+        '-quantities',
+        '-favorited_by',
+        
+    )
 
     def __repr__(self):
         return f'Taco {self.taco_name} ID {self.id}'
@@ -91,10 +97,10 @@ class Taco(db.Model, SerializerMixin):
 # add validation rules here once seeded 
 class Ingredients(db.Model, SerializerMixin):
     __tablename__ = "ingredients"
-    # serialize_rules = (
-    #     "-quantities.ingredient",
-    #     "-quantities.taco",
-    # )
+    serialize_rules = (
+        "-quantities.ingredient",
+        "-quantities.taco",
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)

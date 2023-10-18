@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
-
-# Remote library imports
-from flask import Flask, request, make_response, session
-from flask_restful import Resource, Api
-from flask_sqlalchemy import SQLAlchemy
+from flask import request, make_response, session, abort
+from flask_restful import Resource
 from models import *
-
+from werkzeug.exceptions import Unauthorized
+import re
 
 # Local imports
 from config import app, db, api
 
+# Add your model imports
+from models import *
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
 
-api = Api(app)
+
 
 # Add your model imports
 
@@ -80,15 +77,24 @@ class Logout(Resource):
 api.add_resource(Logout, "/logout")
 
 
-class Taco(Resource):
+class Tacos(Resource):
     def get(self):
-        tacos = [
-            taco.to_dict(rules=("-quantities.ingredient.quantities",))
-            for taco in Taco.query.all()
+        tacos = Taco.query.all()
+        
+        # Format the tacos with properly spaced instructions
+        formatted_tacos = [
+            {
+                "taco_name": taco.taco_name,
+                "instructions": taco.instructions.split("\n"),  # Split instructions by newlines
+                "time_to_cook": taco.time_to_cook,
+                "time_to_prepare": taco.time_to_prepare,
+                "image": taco.image,
+                
+            }
+            for taco in tacos
         ]
-        for taco in tacos:
-            taco["instructions"] = re.split(r"\d+\.\s", taco["instructions"])[1:]
-        return make_response(tacos, 200)
+        
+        return make_response(formatted_tacos, 200)
 
     def post(self):
         data = request.get_json()
@@ -111,7 +117,7 @@ class Taco(Resource):
         )
 
 
-api.add_resource(Taco, "/Taco")
+api.add_resource(Tacos, "/tacos")
 
 
 class Ingredients(Resource):
@@ -122,27 +128,6 @@ class Ingredients(Resource):
 
 api.add_resource(Ingredients, "/ingredients")
 
-class Review(Resource):
-    def get(self):
-        review = [review.to_dict() for review in Review.query.all()]
-        return make_response(Review, 200)
-
-    def post(self):
-        data = request.get_json()
-        try:
-            new_review = Review(
-                review=data["Review"],
-                taco_id=data["taco_id"],
-            )
-        except ValueError:
-            return make_response({"errors": ["validation errors"]}, 400)
-        db.session.add(new_review)
-        db.session.commit()
-
-        return make_response(new_review.to_dict(), 201)
-
-
-api.add_resource(Review, "/review")
 
 
 class Quantities(Resource):
@@ -171,8 +156,8 @@ class Users(Resource):
         users = [
             user.to_dict(
                 rules=(
-                    "-collections",
-                    "-Taco",
+                    "-favorites",
+                    "-Tacos",
                 )
             )
             for user in User.query.all()
