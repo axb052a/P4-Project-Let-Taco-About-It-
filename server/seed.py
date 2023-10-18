@@ -97,7 +97,7 @@ if __name__ == '__main__':
         ]
 
         for ingredient_name in ingredient_list:
-            ingredient = Ingredients(name=ingredient_name)
+            ingredient = Ingredient(name=ingredient_name)
             db.session.add(ingredient)
 
         db.session.commit()

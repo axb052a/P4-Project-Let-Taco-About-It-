@@ -17,19 +17,22 @@ user_taco_favorites = db.Table(
 )
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
-    serialize_rules = (
-        '-tacos.user', 
-        '-favorites.user',
-    )
+   
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    _password_hash = db.Column(db.String, nullable=False)
+
     favorite_tacos = db.relationship(
         "Taco",
         secondary=user_taco_favorites,
         back_populates="favorited_by",
     )
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, nullable=False)
-    email = db.Column(db.String, nullable=False)
-    _password_hash = db.Column(db.String, nullable=False)
+
+    serialize_rules = (
+        '-tacos.user', 
+        '-favorites.user',
+    )
 
     def __repr__(self):
         return f"User {self.username}, ID {self.id}"
@@ -95,21 +98,26 @@ class Taco(db.Model, SerializerMixin):
         return f'Taco {self.taco_name} ID {self.id}'
 
 # add validation rules here once seeded 
-class Ingredients(db.Model, SerializerMixin):
+class Ingredient(db.Model, SerializerMixin):
     __tablename__ = "ingredients"
-    serialize_rules = (
-        "-quantities.ingredient",
-        "-quantities.taco",
-    )
+   
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    quantities = db.relationship("Quantity", back_populates="ingredients", cascade="all, delete-orphan")
+    tacos = association_proxy("quantities", "taco")
+
+    serialize_rules = (
+        "-quantities",
+        "-favorited_by",
+        "-tacos",
+        
+    )
 
     def __repr__(self):
         return f"Ingredient {self.name}"
 
-    quantities = db.relationship("Quantity", back_populates="ingredients", cascade="all, delete-orphan")
-    tacos = association_proxy("quantities", "taco")
+    
 
 class Quantity(db.Model, SerializerMixin):
     __tablename__ = "quantities"
@@ -120,7 +128,7 @@ class Quantity(db.Model, SerializerMixin):
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     taco = db.relationship("Taco", back_populates="quantities")
 
-    ingredients = db.relationship("Ingredients", back_populates="quantities")
+    ingredients = db.relationship("Ingredient", back_populates="quantities")
    
     
     def __repr__(self):

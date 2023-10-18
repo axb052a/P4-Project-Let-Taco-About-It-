@@ -84,6 +84,7 @@ class Tacos(Resource):
         # Format the tacos with properly spaced instructions
         formatted_tacos = [
             {
+                "taco_id":taco.id,
                 "taco_name": taco.taco_name,
                 "instructions": taco.instructions.split("\n"),  # Split instructions by newlines
                 "time_to_cook": taco.time_to_cook,
@@ -104,8 +105,8 @@ class Tacos(Resource):
                 instructions=data["instructions"],
                 time_to_cook=data["time_to_cook"],
                 time_to_prepare=data["time_to_prepare"],
-                image="images/table-food.jpg" if not data["image"] else data["image"],
-                user_id=session["user_id"],
+                image=data.get("image", "images/table-food.jpg")
+             
             )
         except ValueError:
             return make_response({"errors": ["validation errors"]}, 400)
@@ -113,16 +114,16 @@ class Tacos(Resource):
         db.session.commit()
 
         return make_response(
-            new_taco.to_dict(rules=("-quantities.ingredient.quantities",)), 201
+            new_taco.to_dict(), 201
         )
+    
 
 
 api.add_resource(Tacos, "/tacos")
 
-
 class Ingredients(Resource):
     def get(self):
-        ingredients = [ingredient.to_dict() for ingredient in Ingredients.query.all()]
+        ingredients = [ingredient.to_dict() for ingredient in Ingredient.query.all()]
         return make_response(ingredients, 200)
 
 
@@ -156,8 +157,9 @@ class Users(Resource):
         users = [
             user.to_dict(
                 rules=(
-                    "-favorites",
-                    "-Tacos",
+                  
+                    "-tacos",
+                    "-favorite_tacos",
                 )
             )
             for user in User.query.all()
@@ -167,6 +169,46 @@ class Users(Resource):
 
 api.add_resource(Users, "/users")
 
+
+@app.route('/favorite-taco/<int:taco_id>', methods=['POST'])
+def favorite_taco(taco_id):
+    if 'user_id' not in session:
+        return {"error": "You must be logged in to favorite a taco"}, 401
+
+    user_id = session['user_id']
+    favorite = Favorite(user_id=user_id, taco_id=taco_id)
+    db.session.add(favorite)
+    db.session.commit()
+
+    return {"message": "Taco favorited successfully"}, 200
+
+
+# class Favorites(Resource):
+#     def get(self):
+#         # Retrieve the 'username' of the logged-in user from the session or wherever it's stored.
+       
+#         username = session.get("user_id")  
+
+#         if not username:
+#             return {"error": "You must be logged in to view your favorites"}, 401
+
+#         # Query the User model to get the user based on the 'username'
+#         user = User.query.filter_by(username=username).first()
+
+#         if user is None:
+#             return {"error": "User not found"}, 404
+
+#         # Access the favorite_tacos relationship from the user
+#         user_favorites = user.favorite_tacos
+
+#         # Extract the taco information from the favorites
+#         favorites = [favorite.to_dict() for favorite in user_favorites]
+
+#         return make_response(favorites, 200)
+
+
+
+# api.add_resource(Favorites, "/favorites")
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
