@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+from flask_cors import CORS
+from flask import Flask
 from flask import request, make_response, session, abort
 from flask_restful import Resource
 from models import *
@@ -11,6 +14,10 @@ from config import app, db, api
 # Add your model imports
 from models import *
 
+
+
+
+cors = CORS(app)
 
 
 
