@@ -1,17 +1,13 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
+import React, { useEffect, useState } from "react";
+import { useFormik } from "formik";
 import * as yup from "yup";
 import {
   FormControl,
   FormLabel,
   Input,
-  Textarea,
-  Button,
-  Stack,
-  Heading,
   Select,
-  HStack,
-  Box,
+  Button,
+  Text,
 } from "@chakra-ui/react";
 
 const validationSchema = yup.object().shape({
@@ -23,94 +19,121 @@ const validationSchema = yup.object().shape({
   time_to_prepare: yup.number().required("Time to prepare is required"),
 });
 
-function AddTaco() {
-  const handleSubmit = (formData) => {
-    console.log("Form data to be submitted:", formData);
-
-    fetch("http://localhost:5555/tacos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Response from the backend:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+function AddTaco({ setRefreshPage }) {
+  const [successMessage, setSuccessMessage] = useState("");
+  const formik = useFormik({
+    initialValues: {
+      taco_name: "",
+      image: "",
+      taco_type: "",
+      instructions: "",
+      time_to_cook: "",
+      time_to_prepare: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      fetch("http://localhost:5555/tacos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }).then((response) => {
+        if (response.status === 201) {
+          setRefreshPage((prev) => !prev);
+          setSuccessMessage("Taco added successfully.");
+        }
       });
-  };
+    },
+  });
 
   return (
     <div>
-      <Formik
-        initialValues={{
-          taco_name: "",
-          image: "",
-          taco_type: "",
-          instructions: "",
-          time_to_cook: "",
-          time_to_prepare: "",
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {() => (
-          <Form>
-            <Stack spacing={4} maxW={"lg"} py={4} px={6}>
-              <Heading fontSize={"4xl"} textAlign={"center"}>
-                Add Taco!
-              </Heading>
-              <Box rounded={"lg"} bg={"white"} boxShadow={"lg"} p={8}>
-                <FormControl id="taco_name" isRequired>
-                  <FormLabel>Taco Name</FormLabel>
-                  <Input type="text" name="taco_name" />
-                </FormControl>
-                <FormControl id="image" isRequired>
-                  <FormLabel>Image URL</FormLabel>
-                  <Input type="text" name="image" />
-                </FormControl>
-                <HStack>
-                  <FormControl id="time_to_prepare" isRequired>
-                    <FormLabel>Time to Prepare</FormLabel>
-                    <Input type="number" name="time_to_prepare" />
-                  </FormControl>
-                  <FormControl id="time_to_cook" isRequired>
-                    <FormLabel>Time to Cook</FormLabel>
-                    <Input type="number" name="time_to_cook" />
-                  </FormControl>
-                </HStack>
-                <FormControl id="taco_type" isRequired>
-                  <FormLabel>Taco Type</FormLabel>
-                  <Select type="text" name="taco_type">
-                    <option value="Beef">Beef</option>
-                    <option value="Chicken">Chicken</option>
-                    <option value="Vegetarian">Vegetarian</option>
-                  </Select>
-                </FormControl>
-                <FormControl id="instructions" isRequired>
-                  <FormLabel>Instructions</FormLabel>
-                  <Textarea name="instructions" />
-                </FormControl>
-                <Button
-                  type="submit"
-                  loadingText="Submitting"
-                  size="lg"
-                  bg={"orange.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: "orange.500",
-                  }}
-                >
-                  Add Taco
-                </Button>
-              </Box>
-            </Stack>
-          </Form>
-        )}
-      </Formik>
+      {successMessage && <Text color="green">{successMessage}</Text>}
+      <form onSubmit={formik.handleSubmit} style={{ margin: "30px" }}>
+        <FormControl id="taco_name" isRequired>
+          <FormLabel>Taco Name</FormLabel>
+          <Input
+            type="text"
+            name="taco_name"
+            value={formik.values.taco_name}
+            onChange={formik.handleChange}
+          />
+          {formik.errors.taco_name && (
+            <Text color="red">{formik.errors.taco_name}</Text>
+          )}
+        </FormControl>
+
+        <FormControl id="image" isRequired>
+          <FormLabel>Image URL</FormLabel>
+          <Input
+            type="text"
+            name="image"
+            value={formik.values.image}
+            onChange={formik.handleChange}
+          />
+          {formik.errors.image && (
+            <Text color="red">{formik.errors.image}</Text>
+          )}
+        </FormControl>
+
+        <FormControl id="time_to_prepare" isRequired>
+          <FormLabel>Time to Prepare</FormLabel>
+          <Input
+            type="number"
+            name="time_to_prepare"
+            value={formik.values.time_to_prepare}
+            onChange={formik.handleChange}
+          />
+          {formik.errors.time_to_prepare && (
+            <Text color="red">{formik.errors.time_to_prepare}</Text>
+          )}
+        </FormControl>
+
+        <FormControl id="time_to_cook" isRequired>
+          <FormLabel>Time to Cook</FormLabel>
+          <Input
+            type="number"
+            name="time_to_cook"
+            value={formik.values.time_to_cook}
+            onChange={formik.handleChange}
+          />
+          {formik.errors.time_to_cook && (
+            <Text color="red">{formik.errors.time_to_cook}</Text>
+          )}
+        </FormControl>
+
+        <FormControl id="taco_type" isRequired>
+          <FormLabel>Taco Type</FormLabel>
+          <Select
+            name="taco_type"
+            value={formik.values.taco_type}
+            onChange={formik.handleChange}
+          >
+            <option value="Beef">Beef</option>
+            <option value="Chicken">Chicken</option>
+            <option value="Vegetarian">Vegetarian</option>
+          </Select>
+          {formik.errors.taco_type && (
+            <Text color="red">{formik.errors.taco_type}</Text>
+          )}
+        </FormControl>
+
+        <FormControl id="instructions" isRequired>
+          <FormLabel>Instructions</FormLabel>
+          <Input
+            as="textarea"
+            name="instructions"
+            value={formik.values.instructions}
+            onChange={formik.handleChange}
+          />
+          {formik.errors.instructions && (
+            <Text color="red">{formik.errors.instructions}</Text>
+          )}
+        </FormControl>
+
+        <Button type="submit">Add Taco</Button>
+      </form>
     </div>
   );
 }

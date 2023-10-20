@@ -31,7 +31,7 @@ export default function SearchBar({ onSearch }) {
           type="text"
           value={search}
           onChange={handleSearchChange}
-          placeholder="Search for taco..."
+          placeholder="Search for an interesting taco..."
           focusBorderColor="orange.300"
           color="orange.500"
           _placeholder={{ color: "inherit" }}

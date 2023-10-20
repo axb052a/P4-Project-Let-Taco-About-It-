@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Box, Flex } from "@chakra-ui/react";
 import { Link as ChakraLink } from "@chakra-ui/react";
 
@@ -13,18 +13,21 @@ function NavigationBar() {
       justify="space-between"
     >
       <Box>
-        <ChakraLink as={Link} to="/" fontSize="xl">
+        <ChakraLink as={NavLink} to="/" fontSize="xl">
           Let's Taco Bout It
         </ChakraLink>
       </Box>
       <Flex align="center">
-        <ChakraLink as={Link} to="/AddTaco" fontSize="lg" mr={4}>
+        <ChakraLink as={NavLink} to="/AddTaco" fontSize="lg" mr={4}>
+         Your Fave Tacos
+        </ChakraLink>
+        <ChakraLink as={NavLink} to="/AddTaco" fontSize="lg" mr={4}>
           Add Taco
         </ChakraLink>
-        <ChakraLink as={Link} to="/signup" fontSize="lg" mr={4}>
+        <ChakraLink as={NavLink} to="/signup" fontSize="lg" mr={4}>
           Signup
         </ChakraLink>
-        <ChakraLink as={Link} to="/login" fontSize="lg" mr={4}>
+        <ChakraLink as={NavLink} to="/login" fontSize="lg" mr={4}>
           Login
         </ChakraLink>
         {/* You can add more navigation links here if needed */}

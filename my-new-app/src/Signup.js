@@ -78,7 +78,7 @@ export default function Signup({ setUser, fetchUser }) {
               lineHeight={1.1}
               fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
             >
-              Come on , lets Taco Bout' it! 
+             Create an account 
               <Text
                 as={"span"}
                 bgGradient="linear(to-r, yellow.400, orange.400)"
