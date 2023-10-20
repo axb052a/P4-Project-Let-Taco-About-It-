@@ -18,6 +18,12 @@ function NavigationBar() {
         </ChakraLink>
       </Box>
       <Flex align="center">
+        <ChakraLink as={Link} to="/AddTaco" fontSize="lg" mr={4}>
+          Add Taco
+        </ChakraLink>
+        <ChakraLink as={Link} to="/signup" fontSize="lg" mr={4}>
+          Signup
+        </ChakraLink>
         <ChakraLink as={Link} to="/login" fontSize="lg" mr={4}>
           Login
         </ChakraLink>
