@@ -24,7 +24,7 @@ export default function Signup({ setUser, fetchUser }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch("/signup", {
+    fetch("http://localhost:5555/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
