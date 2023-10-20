@@ -1,13 +1,28 @@
-import React from "react";
-import Home from "./Home"; // Assuming your Home component is in the same directory
+import React, { useState } from "react";
+import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import Home from "./Home";
+import Login from "./Login"; // Import your Login component
+import NavBar from "./NavBar";
+
 
 function App() {
+
+  const [user, setUser] = useState(null);
   return (
-    <div>
-      {/* Your other components can go here */}
-      <Home />
-      {/* Add other components here */}
-    </div>
+    <ChakraProvider>
+      <Router>
+        <NavBar /> {NavBar}
+        <Switch>
+          <Route path="/login">
+            <Login user={user} setUser={setUser} />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
+    </ChakraProvider>
   );
 }
 
