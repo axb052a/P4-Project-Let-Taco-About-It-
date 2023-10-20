@@ -19,7 +19,7 @@ function NavigationBar() {
       </Box>
       <Flex align="center">
         <ChakraLink as={NavLink} to="/AddTaco" fontSize="lg" mr={4}>
-         Your Fave Tacos
+          Your Fave Tacos
         </ChakraLink>
         <ChakraLink as={NavLink} to="/AddTaco" fontSize="lg" mr={4}>
           Add Taco
@@ -29,6 +29,9 @@ function NavigationBar() {
         </ChakraLink>
         <ChakraLink as={NavLink} to="/login" fontSize="lg" mr={4}>
           Login
+        </ChakraLink>
+        <ChakraLink as={NavLink} to="/login" fontSize="lg" mr={4}>
+          Logout
         </ChakraLink>
         {/* You can add more navigation links here if needed */}
       </Flex>

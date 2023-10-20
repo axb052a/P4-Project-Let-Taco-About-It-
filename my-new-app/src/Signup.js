@@ -55,7 +55,7 @@ export default function Signup({ setUser, fetchUser }) {
             lineHeight={1.1}
             fontSize={{ base: "3xl", sm: "4xl", md: "5xl", lg: "6xl" }}
           >
-            Welcome to{" "}
+            Welcome. {" "}
             <Text
               as={"span"}
               bgGradient="linear(to-r, yellow.400, orange.400)"
