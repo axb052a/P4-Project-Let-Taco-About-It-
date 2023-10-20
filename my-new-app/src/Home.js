@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 import { SimpleGrid, Box, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 function Home() {
   const [tacoRecipes, setTacoRecipes] = useState([]);
@@ -34,11 +35,11 @@ function Home() {
         textAlign="center"
         mt="10"
       >
-        Let's Taco Bout' it
+        Taco Feed
       </Text>
-      <SimpleGrid px="40" columns={4} spacing={4}>
-      
-      </SimpleGrid>
+
+      <Link to="/Login">Login</Link>
+      <SimpleGrid px="40" columns={4} spacing={4}></SimpleGrid>
     </Box>
   );
 }
